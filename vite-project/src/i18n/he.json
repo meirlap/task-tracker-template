@@ -1,0 +1,18 @@
+{
+    "app": {
+      "title": "מעקב משימות",
+      "logout": "התנתק",
+      "hello": "שלום",
+      "login_prompt": "אנא התחבר"
+    },
+    "dashboard": {
+      "select_child": "בחר ילד",
+      "back": "חזור לרשימה",
+      "tasks_title": "המשימות של {{name}}",
+      "date": "תאריך",
+      "task": "משימה",
+      "completed": "הושלם",
+      "id": "תעודת זהות"
+    }
+  }
+  

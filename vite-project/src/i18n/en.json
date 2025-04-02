@@ -1,0 +1,18 @@
+{
+    "app": {
+      "title": "Patient Task Tracker",
+      "logout": "Logout",
+      "hello": "Hello",
+      "login_prompt": "Please log in"
+    },
+    "dashboard": {
+      "select_child": "Select a Child",
+      "back": "Back to List",
+      "tasks_title": "{{name}}'s Tasks",
+      "date": "Date",
+      "task": "Task",
+      "completed": "Completed",
+      "id": "ID"
+    }
+  }
+  

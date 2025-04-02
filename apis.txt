@@ -1,0 +1,5 @@
+Client ID
+184905695736-debh58o5r37roane5987gc240vahmgvl.apps.googleusercontent.com
+
+Client secret
+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

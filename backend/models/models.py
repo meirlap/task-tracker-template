@@ -23,7 +23,7 @@ class Parent(db.Model):
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
 
-    children = db.relationship('Patient', backref='parent', lazy=True)
+    patients = db.relationship('Patient', backref='parent', lazy=True)
 
     def serialize(self):
         return {
@@ -79,6 +79,10 @@ class Task(db.Model):
     date = db.Column(db.Date, default=date.today, nullable=False)
     description = db.Column(db.String(255), nullable=False)
     completed = db.Column(db.Boolean, default=False)
+    reason_not_completed = db.Column(db.String(50), nullable=True)  # מחלה, שכחה...
+    allergy_reaction = db.Column(db.Integer, nullable=True)         # 1–5
+    notes = db.Column(db.Text, nullable=True)                       # הערות חופשיות
+
 
     def serialize(self):
         return {
@@ -86,7 +90,11 @@ class Task(db.Model):
             "patient_id": self.patient_id,
             "date": self.date.isoformat(),
             "description": self.description,
-            "completed": self.completed
+            "completed": self.completed,
+            "reason_not_completed": self.reason_not_completed,
+            "allergy_reaction": self.allergy_reaction,
+            "notes": self.notes
+
         }
 
 

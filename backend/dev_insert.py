@@ -7,63 +7,71 @@ with app.app_context():
     db.drop_all()
     db.create_all()
 
-    # 👨‍⚕️ רופא ראשי
+    # 👨‍⚕️ רופאים
     doctor1 = Doctor(name="ד\"ר ראובן שפירא", email="jlm.tech.solution.ml@gmail.com")
-    # 👨‍⚕️ רופא נוסף
     doctor2 = Doctor(name="ד\"ר משה לוין", email="second.doctor@example.com")
     db.session.add_all([doctor1, doctor2])
     db.session.commit()
 
-    # 👩‍👧 הורה 1 - אמונה
+    # 👨‍👩‍ הורים
     parent1 = Parent(name="אמונה לפיד", email="emunalapid@gmail.com")
-    # 👨‍👧 הורה 2 - מאיר
     parent2 = Parent(name="מאיר לפיד", email="meirlapid@gmail.com")
-    # 👩‍👦 הורה 3
     parent3 = Parent(name="הודיה אברהם", email="parent3@example.com")
-    # 👨‍👧 הורה 4
     parent4 = Parent(name="נתנאל בורוכוב", email="parent4@example.com")
-
     db.session.add_all([parent1, parent2, parent3, parent4])
     db.session.commit()
 
-    # 🧒 ילדים של הורה 1
-    p1 = Patient(name="יעל לפיד", israeli_id="123456781", parent=parent1, doctor=doctor1)
-    p2 = Patient(name="אורי לפיד", israeli_id="123456782", parent=parent1, doctor=doctor1)
-    p3 = Patient(name="תמר לפיד", israeli_id="123456783", parent=parent1, doctor=doctor1)
+    # שליפת ישויות לפי מייל לזיהוי אמין
+    doctor1 = Doctor.query.filter_by(email="jlm.tech.solution.ml@gmail.com").first()
+    doctor2 = Doctor.query.filter_by(email="second.doctor@example.com").first()
+    parent1 = Parent.query.filter_by(email="emunalapid@gmail.com").first()
+    parent2 = Parent.query.filter_by(email="meirlapid@gmail.com").first()
+    parent3 = Parent.query.filter_by(email="parent3@example.com").first()
+    parent4 = Parent.query.filter_by(email="parent4@example.com").first()
 
-    # 🧒 ילדים של הורה 2
-    p4 = Patient(name="אליהו לפיד", israeli_id="123456784", parent=parent2, doctor=doctor1)
-    p5 = Patient(name="רוני לפיד", israeli_id="123456785", parent=parent2, doctor=doctor1)
-    p6 = Patient(name="דני לפיד", israeli_id="123456786", parent=parent2, doctor=doctor1)
+    # 🧒 מטופלים עם שיוך תקני לפי מייל
+    patients = [
+        Patient(name="יעל לפיד", israeli_id="123456781", parent=parent1, doctor=doctor1),
+        Patient(name="אורי לפיד", israeli_id="123456782", parent=parent1, doctor=doctor1),
+        Patient(name="תמר לפיד", israeli_id="123456783", parent=parent1, doctor=doctor1),
 
-    # 🧒 ילד של הורה 3
-    p7 = Patient(name="יונתן אברהם", israeli_id="123456787", parent=parent3, doctor=doctor2)
-    # 🧒 ילד של הורה 4
-    p8 = Patient(name="שרה בורוכוב", israeli_id="123456788", parent=parent4, doctor=doctor2)
+        Patient(name="אליהו לפיד", israeli_id="123456784", parent=parent2, doctor=doctor1),
+        Patient(name="רוני לפיד", israeli_id="123456785", parent=parent2, doctor=doctor1),
+        Patient(name="דני לפיד", israeli_id="123456786", parent=parent2, doctor=doctor1),
 
-    # 🧍‍♂️ מטופל עצמאי
-    p9 = Patient(name="אליה לפיד", israeli_id="123456789", email="eliyalapid@gmail.com", doctor=doctor1)
-    # 🧍 מטופלי דמה
-    p10 = Patient(name="עומר דמה", israeli_id="123456790", email="dummy1@example.com", doctor=doctor2)
-    p11 = Patient(name="רוני דמה", israeli_id="123456791", email="dummy2@example.com", doctor=doctor2)
+        Patient(name="יונתן אברהם", israeli_id="123456787", parent=parent3, doctor=doctor2),
+        Patient(name="שרה בורוכוב", israeli_id="123456788", parent=parent4, doctor=doctor2),
 
-    all_patients = [p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11]
-    db.session.add_all(all_patients)
+        Patient(name="אליה לפיד", israeli_id="123456789", email="eliyalapid@gmail.com", doctor=doctor1),
+        Patient(name="עומר דמה", israeli_id="123456790", email="dummy1@example.com", doctor=doctor2),
+        Patient(name="רוני דמה", israeli_id="123456791", email="dummy2@example.com", doctor=doctor2),
+    ]
+
+    db.session.add_all(patients)
     db.session.commit()
-
-    # 📆 הוספת משימות ל־3 ימים אחרונים
+    # 📆 משימות להיום, 3 ימים אחורה ו־7 ימים קדימה (סה"כ 11 ימים)
     def add_tasks(patient):
-        for i in range(3):
+        for offset in range(-3, 8):  # -3 עד +7 כולל היום
+            task_date = date.today() + timedelta(days=offset)
+            is_completed = offset < 0  # רק משימות מהעבר מסומנות כבוצעות
             task = Task(
                 patient=patient,
-                date=date.today() - timedelta(days=i),
-                description=f"משימה {i+1} עבור {patient.name}",
-                completed=(i % 2 == 0)
+                date=task_date,
+                description=f"משימה לתאריך {task_date} עבור {patient.name}",
+                completed=is_completed,
+                allergy_reaction=4 if is_completed else None,
+                reason_not_completed=None if is_completed else "",
+                notes="הוזן על ידי dev_insert"
             )
             db.session.add(task)
 
-    for patient in all_patients:
+
+    for patient in patients:
         add_tasks(patient)
 
     db.session.commit()
-    print("✅ DONE: doctors, parents, patients, tasks.")
+
+    for task in Task.query.all():
+        print(f"✅ Task ID: {task.id} | {task.description} | Patient: {task.patient.name} | Completed: {task.completed}")
+
+    print("✅ DB seeded successfully.")

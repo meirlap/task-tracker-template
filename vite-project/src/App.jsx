@@ -30,19 +30,13 @@ const App = () => {
   return (
     <Box>
       <AppBar position="static">
-        <Toolbar sx={{ display: 'flex', alignItems: 'center' }}>
+        <Toolbar>
           <MedicalServicesIcon sx={{ mr: 2 }} />
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
             {t('app.title')}
           </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <LanguageSelector />
-            {user && (
-              <Button color="inherit" onClick={handleLogout}>
-                {t('app.logout')}
-              </Button>
-            )}
-          </Box>
+          <LanguageSelector />
+          {user && <Button color="inherit" onClick={handleLogout}>{t('app.logout')}</Button>}
         </Toolbar>
       </AppBar>
 
@@ -56,9 +50,7 @@ const App = () => {
           <Paper sx={{ p: 4 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
               <Avatar src={user.picture} sx={{ mr: 2 }} />
-              <Typography variant="h6">
-                {t('app.hello')}, {user.name}!
-              </Typography>
+              <Typography variant="h6">{t('app.hello')}, {user.name}!</Typography>
             </Box>
             <UserDashboard userEmail={user.email} />
           </Paper>

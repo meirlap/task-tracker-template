@@ -1,18 +1,35 @@
 {
-    "app": {
-      "title": "מעקב משימות",
-      "logout": "התנתק",
-      "hello": "שלום",
-      "login_prompt": "אנא התחבר"
-    },
-    "dashboard": {
-      "select_child": "בחר ילד",
-      "back": "חזור לרשימה",
-      "tasks_title": "המשימות של {{name}}",
-      "date": "תאריך",
-      "task": "משימה",
-      "completed": "הושלם",
-      "id": "תעודת זהות"
-    }
+  "app": {
+    "title": "מעקב משימות",
+    "logout": "התנתק",
+    "hello": "שלום",
+    "login_prompt": "אנא התחבר"
+  },
+  "dashboard": {
+    "select_child": "בחר ילד",
+    "back": "חזור לרשימה",
+    "tasks_title": "המשימות של {{name}}",
+    "date": "תאריך",
+    "task": "משימה",
+    "completed": "הושלם",
+    "id": "תעודת זהות"
+  },
+  "task": {
+    "answer": "ענה למשימה",
+    "close_feedback": "סגור מענה",
+    "show_history": "הצג היסטוריה",
+    "hide_history": "הסתר היסטוריה",
+    "completed": "האם בוצע?",
+    "yes": "כן",
+    "no": "לא",
+    "reason_not_completed": "סיבת אי-ביצוע",
+    "illness": "מחלה",
+    "forgot": "שכחתי",
+    "other": "אחר",
+    "allergy_reaction": "דירוג תגובה אלרגית",
+    "none": "0 - אין",
+    "notes": "הערות",
+    "submit_feedback": "שלח משוב",
+    "today_task": "משימה להיום"
   }
-  
+}

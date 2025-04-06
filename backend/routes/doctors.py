@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from models.models import Doctor, Patient, Task
+from models import Doctor, Patient, Task
 from datetime import datetime, timedelta
 
 doctors_bp = Blueprint('doctors', __name__, url_prefix='/api/doctor')

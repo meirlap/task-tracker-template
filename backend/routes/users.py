@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify
-from models.models import Parent, Patient
+from models import Parent, Patient
 
 users_bp = Blueprint('users', __name__)
 

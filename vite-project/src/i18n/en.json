@@ -1,18 +1,35 @@
 {
-    "app": {
-      "title": "Patient Task Tracker",
-      "logout": "Logout",
-      "hello": "Hello",
-      "login_prompt": "Please log in"
-    },
-    "dashboard": {
-      "select_child": "Select a Child",
-      "back": "Back to List",
-      "tasks_title": "{{name}}'s Tasks",
-      "date": "Date",
-      "task": "Task",
-      "completed": "Completed",
-      "id": "ID"
-    }
+  "app": {
+    "title": "Task Tracker",
+    "logout": "Logout",
+    "hello": "Hello",
+    "login_prompt": "Please log in"
+  },
+  "dashboard": {
+    "select_child": "Select Child",
+    "back": "Back to list",
+    "tasks_title": "{{name}}'s Tasks",
+    "date": "Date",
+    "task": "Task",
+    "completed": "Completed",
+    "id": "ID"
+  },
+  "task": {
+    "answer": "Answer Task",
+    "close_feedback": "Close Feedback",
+    "show_history": "Show History",
+    "hide_history": "Hide History",
+    "completed": "Was it completed?",
+    "yes": "Yes",
+    "no": "No",
+    "reason_not_completed": "Reason for not completing",
+    "illness": "Illness",
+    "forgot": "Forgot",
+    "other": "Other",
+    "allergy_reaction": "Allergic Reaction Rating",
+    "none": "0 - None",
+    "notes": "Notes",
+    "submit_feedback": "Submit Feedback",
+    "today_task": "Today's Task"
   }
-  
+}

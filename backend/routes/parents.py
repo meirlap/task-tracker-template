@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify
-from models.models import Parent, Patient, Task
+from models import Parent, Patient, Task
 from db import db
 
 parents_bp = Blueprint('parents', __name__)
@@ -10,7 +10,8 @@ def get_children_and_tasks(parent_email):
     if not parent:
         return jsonify({"error": "Parent not found"}), 404
 
-    children = Patient.query.filter_by(parent_id=parent.id).all()
+    children = parent.patients
+
     print(children)
 
     result = []
@@ -18,7 +19,7 @@ def get_children_and_tasks(parent_email):
         tasks = Task.query.filter_by(patient_id=child.id).order_by(Task.date.desc()).all()
         result.append({
             "id": child.id,
-            "name": child.name,
+            "name": child.full_name,
             "israeli_id": child.israeli_id,
             "tasks": [t.serialize() for t in tasks]
         })

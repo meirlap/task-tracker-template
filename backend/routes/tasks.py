@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from models.models import Task
+from models import Task
 from db import db
 from datetime import datetime, timedelta
 
@@ -17,21 +17,26 @@ def get_tasks_for_patient(patient_id):
         Task.date >= cutoff
     ).order_by(Task.date.desc()).all()
 
-    return jsonify([t.serialize() for t in tasks])
-@tasks_bp.route('/tasks/<int:task_id>', methods=['PATCH'])
+    return jsonify([t.serialize() for t in tasks])@tasks_bp.route('/tasks/<int:task_id>', methods=['PATCH'])
+@tasks_bp.route('/tasks/<int:task_id>', methods=['PATCH', 'OPTIONS'])
 def update_task(task_id):
+    if request.method == 'OPTIONS':
+        return '', 200  # ← preflight support
+
     print(f"🟢 Received PATCH for task {task_id}")
     task = Task.query.get_or_404(task_id)
     data = request.json
 
     if 'completed' in data:
-        task.completed = data['completed']
-        # אם סומן כלא בוצע – ניקח גם את הסיבה
-        if not data['completed']:
-            task.reason_not_completed = data.get('reason_not_completed')
-            task.allergy_reaction = None  # לא רלוונטי
+        raw_value = data['completed']
+        task.completed = str(raw_value).lower() == 'true' or raw_value is True
+
+        if not task.completed:
+            task.reason_not_completed = data.get('reason_not_completed', '')
+            task.allergy_reaction = None
         else:
-            task.reason_not_completed = None  # לא רלוונטי
+            task.reason_not_completed = None
+            task.allergy_reaction = data.get('allergy_reaction', 0)
 
     if 'allergy_reaction' in data:
         task.allergy_reaction = data['allergy_reaction']
@@ -41,3 +46,5 @@ def update_task(task_id):
 
     db.session.commit()
     return jsonify(task.serialize()), 200
+
+

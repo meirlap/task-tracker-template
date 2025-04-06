@@ -9,7 +9,7 @@ import {
 } from '@mui/material';
 import { patchTask } from '../../utils/api';
 
-const TaskList = ({ patient }) => {
+const TaskList = ({ patient, updateTaskInList }) => {
   const [showFeedbackForm, setShowFeedbackForm] = useState(false);
   const [formData, setFormData] = useState({
     completed: '',
@@ -27,21 +27,24 @@ const TaskList = ({ patient }) => {
 
   const handleSubmit = async () => {
     try {
-      await patchTask(todayTask.id, formData);
-      alert('המשוב נשלח בהצלחה');
+      const updatedTask = await patchTask(todayTask.id, formData);
+
+      updateTaskInList(updatedTask);
       setShowFeedbackForm(false);
+      console.log("✅ Feedback submitted successfully");
     } catch (err) {
-      console.error('Error updating task:', err);
-      alert('שגיאה בשליחת המשוב');
+      console.error("Error updating task:", err);
     }
   };
+
+  if (!todayTask) return null;
 
   return (
     <Card sx={{ my: 2 }}>
       <CardContent>
-        <Typography variant="h6">{patient.name}</Typography>
+        <Typography variant="h6">{patient.full_name}</Typography>
 
-        {todayTask && !showFeedbackForm && (
+        {!showFeedbackForm ? (
           <>
             <Typography sx={{ mt: 1 }}>
               📝 משימה להיום: {todayTask.description}
@@ -50,9 +53,7 @@ const TaskList = ({ patient }) => {
               מענה למשימה
             </Button>
           </>
-        )}
-
-        {todayTask && showFeedbackForm && (
+        ) : (
           <>
             <Typography variant="subtitle1" sx={{ mt: 2 }}>
               📝 משימה להיום: {todayTask.description}
@@ -83,25 +84,28 @@ const TaskList = ({ patient }) => {
               >
                 <MenuItem value="מחלה">מחלה</MenuItem>
                 <MenuItem value="שכחתי">שכחתי</MenuItem>
+                <MenuItem value="מחסור במוצר">מחסור במוצר</MenuItem>
                 <MenuItem value="אחר">אחר</MenuItem>
               </TextField>
             )}
 
-            <TextField
-              select
-              fullWidth
-              name="allergy_reaction"
-              label="דירוג תגובה אלרגית"
-              value={formData.allergy_reaction}
-              onChange={handleChange}
-              sx={{ mt: 2 }}
-            >
-              <MenuItem value={0}>0 - אין</MenuItem>
-              <MenuItem value={1}>1</MenuItem>
-              <MenuItem value={2}>2</MenuItem>
-              <MenuItem value={3}>3</MenuItem>
-              <MenuItem value={4}>4 - חמורה</MenuItem>
-            </TextField>
+            {formData.completed === "true" && (
+              <TextField
+                select
+                fullWidth
+                name="allergy_reaction"
+                label="דירוג תגובה אלרגית"
+                value={formData.allergy_reaction}
+                onChange={handleChange}
+                sx={{ mt: 2 }}
+              >
+                <MenuItem value={0}>0 - אין</MenuItem>
+                <MenuItem value={1}>1</MenuItem>
+                <MenuItem value={2}>2</MenuItem>
+                <MenuItem value={3}>3</MenuItem>
+                <MenuItem value={4}>4 - חמורה</MenuItem>
+              </TextField>
+            )}
 
             <TextField
               fullWidth
@@ -112,6 +116,7 @@ const TaskList = ({ patient }) => {
               value={formData.notes}
               onChange={handleChange}
               sx={{ mt: 2 }}
+              placeholder=""
             />
 
             <Button

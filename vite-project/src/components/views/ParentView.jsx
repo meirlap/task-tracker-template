@@ -1,163 +1,113 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-  Typography,
-  Card,
-  CardContent,
-  CardActions,
-  Button,
-  Collapse,
-  TextField,
-  MenuItem,
-  Divider,
+  Card, CardContent, Typography, Button, Box, Collapse
 } from '@mui/material';
-import { getChildrenAndTasks, patchTask } from '../../utils/api';
+import { getChildrenAndTasks } from '../../utils/api';
+import TodayTaskForm from '../TodayTaskForm';
+import TaskHistoryList from '../TaskHistoryList';
 
 const ParentView = ({ parentEmail }) => {
   const [children, setChildren] = useState([]);
-  const [expandedId, setExpandedId] = useState(null);
-  const [historyShown, setHistoryShown] = useState({});
-  const [formData, setFormData] = useState({});
+  const [showTodayForm, setShowTodayForm] = useState({});
+  const [showHistory, setShowHistory] = useState({});
+
+  const todayStr = new Date().toISOString().split('T')[0];
+
+  const fetchChildren = async () => {
+    try {
+      const data = await getChildrenAndTasks(parentEmail);
+      setChildren(data);
+    } catch (err) {
+      console.error('שגיאה בטעינת הילדים:', err);
+    }
+  };
 
   useEffect(() => {
-    if (parentEmail) {
-      getChildrenAndTasks(parentEmail).then((data) => setChildren(data));
-    }
+    if (parentEmail) fetchChildren();
   }, [parentEmail]);
 
-  const toggleExpanded = (id) => {
-    setExpandedId(expandedId === id ? null : id);
+  const toggleTodayForm = (id) => {
+    setShowTodayForm((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
   const toggleHistory = (id) => {
-    setHistoryShown((prev) => ({ ...prev, [id]: !prev[id] }));
+    setShowHistory((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-  const handleChange = (e, id) => {
-    setFormData((prev) => ({
-      ...prev,
-      [id]: {
-        ...prev[id],
-        [e.target.name]: e.target.value,
-      },
-    }));
-  };
-
-  const handleSubmit = async (e, taskId, id) => {
-    e.preventDefault();
-    try {
-      await patchTask(taskId, formData[id]);
-      alert('עודכן בהצלחה');
-    } catch (err) {
-      console.error('Error updating task:', err);
-    }
+  const updateTaskInState = (childId, updatedTask) => {
+    setChildren(prev =>
+      prev.map(child =>
+        child.id === childId
+          ? {
+              ...child,
+              tasks: child.tasks.map(task =>
+                task.id === updatedTask.id ? updatedTask : task
+              ),
+            }
+          : child
+      )
+    );
   };
 
   return (
-    <div>
-      <Typography variant="h6">📚 רשימת הילדים שלך</Typography>
-      {children.map((child) => {
-        const todayTask = child.tasks.find((t) => new Date(t.date).toDateString() === new Date().toDateString());
-        const otherTasks = child.tasks.filter((t) => t.id !== todayTask?.id);
-        return (
-          <Card key={child.id} sx={{ mt: 2 }}>
-            <CardContent>
-              <Typography variant="h6">{child.name}</Typography>
-
-              {todayTask && (
-                <>
-                  <Typography variant="body2" sx={{ mb: 1 }}>
-                    ✏️ משימה להיום: {todayTask.description}
-                  </Typography>
-                  <Button size="small" onClick={() => toggleExpanded(child.id)}>
-                    {expandedId === child.id ? 'בטל מענה' : 'ענה למשימה'}
-                  </Button>
-                  <Collapse in={expandedId === child.id} timeout="auto" unmountOnExit>
-                    <form onSubmit={(e) => handleSubmit(e, todayTask.id, child.id)}>
-                      <TextField
-                        fullWidth
-                        select
-                        label="האם בוצע?"
-                        name="completed"
-                        value={formData[child.id]?.completed || ''}
-                        onChange={(e) => handleChange(e, child.id)}
-                        sx={{ mt: 2 }}
-                      >
-                        <MenuItem value="true">כן</MenuItem>
-                        <MenuItem value="false">לא</MenuItem>
-                      </TextField>
-                      {formData[child.id]?.completed === 'false' && (
-                    <TextField
-                      fullWidth
-                      select
-                      label="סיבת אי-ביצוע"
-                      name="reason_not_completed"
-                      value={formData[child.id]?.reason_not_completed || ''}
-                      onChange={(e) => handleChange(e, child.id)}
-                      sx={{ mt: 2 }}
-                    >
-                      <MenuItem value="מחלה">מחלה</MenuItem>
-                      <MenuItem value="שכחה">שכחה</MenuItem>
-                      <MenuItem value="אחר">אחר</MenuItem>
-                    </TextField>
-                  )}
-
-                  {formData[child.id]?.completed === 'true' && (
-                    <TextField
-                      fullWidth
-                      select
-                      label="דירוג תגובה אלרגית"
-                      name="allergy_reaction"
-                      value={formData[child.id]?.allergy_reaction || ''}
-                      onChange={(e) => handleChange(e, child.id)}
-                      sx={{ mt: 2 }}
-                    >
-                      <MenuItem value="0">0 - אין תגובה</MenuItem>
-                      <MenuItem value="1">1 - קלה</MenuItem>
-                      <MenuItem value="2">2 - בינונית</MenuItem>
-                      <MenuItem value="3">3 - חמורה</MenuItem>
-                      <MenuItem value="4">4 - חמורה מאוד</MenuItem>
-                    </TextField>
-                  )}
-
-                      <TextField
-                        fullWidth
-                        multiline
-                        rows={3}
-                        label="הערות"
-                        name="notes"
-                        value={formData[child.id]?.notes || ''}
-                        onChange={(e) => handleChange(e, child.id)}
-                        sx={{ mt: 2 }}
-                      />
-                      <Button type="submit" variant="contained" sx={{ mt: 2 }}>
-                        שלח משוב
-                      </Button>
-                    </form>
-                  </Collapse>
-                </>
-              )}
-            </CardContent>
-
-            <CardActions>
-              <Button onClick={() => toggleHistory(child.id)}>
-                {historyShown[child.id] ? 'הסתר היסטוריה' : 'הצג היסטוריה'}
-              </Button>
-            </CardActions>
-
-            <Collapse in={historyShown[child.id]} timeout="auto" unmountOnExit>
+    <Box>
+      {children.length === 0 ? (
+        <Typography variant="body1">אין ילדים להצגה</Typography>
+      ) : (
+        children.map((child) => {
+          const todayTask = child.tasks.find(task => task.date === todayStr);
+          return (
+            <Card key={child.id} sx={{ mb: 3 }}>
               <CardContent>
-                <Typography variant="subtitle2">🗂️ היסטוריית משימות:</Typography>
-                {otherTasks.map((t) => (
-                  <Typography key={t.id} variant="body2">
-                    {t.description} | {t.date} | {t.completed ? '✅' : '❌'}
+                <Typography variant="h6">{child.name}</Typography>
+
+                {todayTask && (
+                  <Typography sx={{ mt: 1 }}>
+                    📝 {todayTask.description}
                   </Typography>
-                ))}
+                )}
+
+                <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
+                  {todayTask && (
+                    <Button
+                      variant="outlined"
+                      onClick={() => toggleTodayForm(child.id)}
+                    >
+                      {showTodayForm[child.id] ? 'סגור מענה' : 'ענה למשימה'}
+                    </Button>
+                  )}
+
+                  <Button
+                    variant="outlined"
+                    onClick={() => toggleHistory(child.id)}
+                  >
+                    {showHistory[child.id] ? 'הסתר היסטוריה' : 'הצג היסטוריה'}
+                  </Button>
+                </Box>
+
+                {todayTask && (
+                  <Collapse in={showTodayForm[child.id]}>
+                    <TodayTaskForm
+                      task={todayTask}
+                      patientName={child.name}
+                      onSubmitSuccess={(updatedTask) =>
+                        updateTaskInState(child.id, updatedTask)
+                      }
+                      onClose={() => toggleTodayForm(child.id)} // סוגר את הטופס
+                    />
+
+                  </Collapse>
+                )}
+
+                <Collapse in={showHistory[child.id]}>
+                  <TaskHistoryList tasks={child.tasks} />
+                </Collapse>
               </CardContent>
-            </Collapse>
-          </Card>
-        );
-      })}
-    </div>
+            </Card>
+          );
+        })
+      )}
+    </Box>
   );
 };
 

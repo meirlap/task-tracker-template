@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Box, Typography, Paper, Divider } from '@mui/material';
 import TodayTaskForm from '../TodayTaskForm';
 import TaskHistoryList from '../TaskHistoryList';
+import TaskList from './TaskList';
 
 const PatientView = ({ patient }) => {
   const [tasks, setTasks] = useState([]);
@@ -16,7 +17,7 @@ const PatientView = ({ patient }) => {
   const handleTaskUpdate = (updatedTask) => {
     setTasks((prevTasks) =>
       prevTasks.map((task) =>
-        task.task_id === updatedTask.task_id ? updatedTask : task
+        task.id === updatedTask.id ? updatedTask : task
       )
     );
   };
@@ -25,13 +26,16 @@ const PatientView = ({ patient }) => {
   const todayTask = tasks.find((task) => task.date === today);
 
   return (
-    <Paper sx={{ p: 3 }}>
+    <Paper sx={{ p: 3, maxWidth: 600, mx: 'auto' }}>
       <Typography variant="h6" sx={{ mb: 1 }}>
-        👤 {patient.name}
+        👤 {patient.full_name}
       </Typography>
 
       {todayTask ? (
-        <TodayTaskForm task={todayTask} onUpdate={handleTaskUpdate} />
+        <TaskList
+          patient={{ ...patient, tasks }}
+          updateTaskInList={handleTaskUpdate}
+        />
       ) : (
         <Typography variant="body1" sx={{ mb: 2 }}>
           אין משימה זמינה להיום.

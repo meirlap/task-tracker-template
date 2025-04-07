@@ -50,7 +50,6 @@ const App = () => {
           <Paper sx={{ p: 4 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
               <Avatar src={user.picture} sx={{ mr: 2 }} />
-              <Typography variant="h6">{t('app.hello')}, {user.name}!</Typography>
             </Box>
             <UserDashboard userEmail={user.email} />
           </Paper>

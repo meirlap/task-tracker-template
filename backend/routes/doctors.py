@@ -60,7 +60,10 @@ def get_patients_tasks_by_email(email):
         result.append({
             "patient": {
                 "id": patient.id,
-                "name": patient.full_name
+                "name": patient.full_name,
+                "israeli_id": patient.israeli_id,
+                "parents": [p.serialize() for p in patient.parents],
+                "email": patient.email
             },
             "tasks": [t.serialize() for t in patient_tasks]
         })

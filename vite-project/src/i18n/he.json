@@ -15,6 +15,10 @@
     "id": "תעודת זהות"
   },
   "task": {
+    "task_history": "היסטוריית משימות",
+    "view_task": "צפייה בטאסק",
+    "create_tasks": "צור משימות",
+    "update_tasks": "עדכן משימות",
     "answer": "ענה למשימה",
     "close_feedback": "סגור מענה",
     "show_history": "הצג היסטוריה",
@@ -31,5 +35,14 @@
     "notes": "הערות",
     "submit_feedback": "שלח משוב",
     "today_task": "משימה להיום"
-  }
+  },
+  "calendar": {
+    "no_task_for_date": "אין משימה לתאריך זה"
+  },
+  "filters": {
+  "filter_name": "סינון לפי שם",
+  "filter_id": "סינון לפי ת\"ז",
+  "filter_email": "סינון לפי אימייל"
+}
+
 }

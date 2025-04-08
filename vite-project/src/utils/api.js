@@ -59,3 +59,31 @@ export const patchTask = async (taskId, updateData) => {
   if (!res.ok) throw new Error('Failed to patch task');
   return res.json();
 };
+export const getTasksForPatient = async (patientId, days = 30) => {
+  const res = await fetch(`${API_BASE}/${patientId}?days=${days}`);
+  if (!res.ok) throw new Error('Failed to get patient tasks');
+  return res.json();
+};
+export const createBulkTasks = async ({ patient_id, description, start_date, end_date }) => {
+  const res = await fetch(`${API_BASE}/tasks/bulk`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ patient_id, description, start_date, end_date })
+  });
+  if (!res.ok) throw new Error('Failed to create bulk tasks');
+  return res.json();
+};
+export const getPatientsTasksByEmail = async (email) => {
+  const res = await fetch(`${API_BASE}/doctors/${encodeURIComponent(email)}/patients-tasks`);
+  if (!res.ok) throw new Error('Failed to fetch patients tasks');
+  return res.json();
+};
+export const replaceTasksFromDate = async ({ patient_id, description, start_date, end_date }) => {
+  const res = await fetch(`${API_BASE}/tasks/replace-from-date`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ patient_id, description, start_date, end_date })
+  });
+  if (!res.ok) throw new Error('Failed to replace tasks');
+  return res.json();
+};

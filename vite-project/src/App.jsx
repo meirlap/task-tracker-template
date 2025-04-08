@@ -40,7 +40,7 @@ const App = () => {
         </Toolbar>
       </AppBar>
 
-      <Container sx={{ mt: 4 }}>
+      <Container maxWidth={false} sx={{ mt: 4, px: 4 }}>
         {!user ? (
           <Paper sx={{ p: 4, textAlign: 'center' }}>
             <Typography variant="h5">🔐 {t('app.login_prompt')}</Typography>

@@ -15,6 +15,10 @@
     "id": "ID"
   },
   "task": {
+    "task_history": "Task History",
+    "view_task": "View Task",
+    "create_tasks": "Create Tasks",
+    "update_tasks": "Update Tasks",
     "answer": "Answer Task",
     "close_feedback": "Close Feedback",
     "show_history": "Show History",
@@ -31,5 +35,14 @@
     "notes": "Notes",
     "submit_feedback": "Submit Feedback",
     "today_task": "Today's Task"
-  }
+  },
+  "calendar": {
+  "no_task_for_date": "No task available for this date"
+},
+"filters": {
+  "filter_name": "Filter by Name",
+  "filter_id": "Filter by ID",
+  "filter_email": "Filter by Email"
+}
+
 }

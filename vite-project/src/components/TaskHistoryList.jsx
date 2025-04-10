@@ -15,9 +15,9 @@ const TaskHistoryList = ({ tasks, excludeDate }) => {
   }
 
   const filtered = tasks
-    .filter(t => t.date !== excludeDate && new Date(t.date) <= new Date())
-    .sort((a, b) => new Date(b.date) - new Date(a.date))
-    .slice(0, 10); // 🔟 רק 10 אחרונים
+  .filter(t => new Date(t.date) <= new Date()) // כולל היום הנוכחי
+  .sort((a, b) => new Date(b.date) - new Date(a.date))
+  .slice(0, 10); // 🔟 הצג רק 10 אחרונים
 
   return (
     <TableContainer component={Paper}>

@@ -1,61 +1,96 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, Paper, Divider } from '@mui/material';
+import {
+  Card, CardContent, Typography, Button, Box, Collapse
+} from '@mui/material';
+import { getTasksForPatient } from '../../utils/api';
 import TodayTaskForm from '../TodayTaskForm';
 import TaskHistoryList from '../TaskHistoryList';
-import TaskList from './TaskList';
 
 const PatientView = ({ patient }) => {
   const [tasks, setTasks] = useState([]);
-  const [showHistory, setShowHistory] = useState(false);
+  const [showTodayForm, setShowTodayForm] = useState(false);
+  const [showHistory, setShowHistory] = useState(true); // ✅ פתוח כברירת מחדל
+
+  const todayStr = new Date().toISOString().split('T')[0];
 
   useEffect(() => {
-    if (patient?.tasks) {
-      setTasks(patient.tasks);
-    }
+    const fetchTasks = async () => {
+      try {
+        const data = await getTasksForPatient(patient.id, 30);
+        setTasks(data);
+      } catch (err) {
+        console.error('שגיאה בטעינת משימות למטופל:', err);
+      }
+    };
+
+    if (patient?.id) fetchTasks();
   }, [patient]);
 
-  const handleTaskUpdate = (updatedTask) => {
-    setTasks((prevTasks) =>
-      prevTasks.map((task) =>
+  const toggleTodayForm = () => {
+    setShowTodayForm(prev => !prev);
+  };
+
+  const toggleHistory = () => {
+    setShowHistory(prev => !prev);
+  };
+
+  const updateTaskInState = (updatedTask) => {
+    setTasks(prev =>
+      prev.map(task =>
         task.id === updatedTask.id ? updatedTask : task
       )
     );
   };
 
-  const today = new Date().toISOString().split('T')[0];
-  const todayTask = tasks.find((task) => task.date === today);
+  const todayTask = tasks.find(task => task.date === todayStr);
 
   return (
-    <Paper sx={{ p: 3, maxWidth: 600, mx: 'auto' }}>
-      <Typography variant="h6" sx={{ mb: 1 }}>
-        👤 {patient.full_name}
-      </Typography>
+    <Box>
+      <Card sx={{ mb: 3 }}>
+        <CardContent>
+          <Typography variant="h6">{patient.full_name}</Typography>
 
-      {todayTask ? (
-        <TaskList
-          patient={{ ...patient, tasks }}
-          updateTaskInList={handleTaskUpdate}
-        />
-      ) : (
-        <Typography variant="body1" sx={{ mb: 2 }}>
-          אין משימה זמינה להיום.
-        </Typography>
-      )}
+          {todayTask && (
+            <Typography sx={{ mt: 1 }}>
+              📝 {todayTask.description}
+            </Typography>
+          )}
 
-      <Divider sx={{ my: 2 }} />
+          <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
+            {todayTask && (
+              <Button
+                variant="outlined"
+                onClick={toggleTodayForm}
+              >
+                {showTodayForm ? 'סגור מענה' : 'ענה למשימה'}
+              </Button>
+            )}
 
-      <Typography
-        variant="body2"
-        sx={{ cursor: 'pointer', textDecoration: 'underline', color: 'primary.main' }}
-        onClick={() => setShowHistory(!showHistory)}
-      >
-        {showHistory ? 'הסתר היסטוריית משימות' : 'הצג היסטוריית משימות'}
-      </Typography>
+            <Button
+              variant="outlined"
+              onClick={toggleHistory}
+            >
+              {showHistory ? 'הסתר היסטוריה' : 'הצג היסטוריה'}
+            </Button>
+          </Box>
 
-      {showHistory && (
-        <TaskHistoryList tasks={tasks} excludeDate={today} />
-      )}
-    </Paper>
+          {todayTask && (
+            <Collapse in={showTodayForm}>
+              <TodayTaskForm
+                task={todayTask}
+                patientName={patient.full_name}
+                onSubmitSuccess={updateTaskInState}
+                onClose={toggleTodayForm}
+              />
+            </Collapse>
+          )}
+
+          <Collapse in={showHistory}>
+            <TaskHistoryList tasks={tasks} />
+          </Collapse>
+        </CardContent>
+      </Card>
+    </Box>
   );
 };
 

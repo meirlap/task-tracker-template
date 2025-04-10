@@ -48,22 +48,27 @@ const PatientDetailsRow = ({ patient, tasks, refreshTasks }) => {
     }
   }, [selectedDate]);
 
+  // 🧠 מיפוי תאריכים -> תיאור משימה
+  const tooltipMap = tasks.reduce((acc, t) => {
+    acc[t.date] = t.description;
+    return acc;
+  }, {});
   const handleReplaceTasks = async () => {
+    if (!selectedDate || !description || !endDate) return;
+  
     try {
       await replaceTasksFromDate({
         patient_id: patient.id,
-        description,
-        start_date: selectedDate,
-        end_date: endDate
+        from_date: selectedDate,
+        to_date: endDate,
+        description: description
       });
-      await refreshTasks();
-      setDescription('');
-      setEndDate('');
+      refreshTasks(); // טען מחדש את רשימת המשימות
     } catch (err) {
-      console.error("❌ Failed to replace tasks", err);
+      console.error('❌ Failed to replace tasks', err);
     }
   };
-
+  
   return (
     <Box
       sx={{
@@ -86,9 +91,9 @@ const PatientDetailsRow = ({ patient, tasks, refreshTasks }) => {
 
         <TaskCalendar
           tasks={tasks}
-          onDateSelect={(dateStr) => {
-            setSelectedDate(dateStr);
-          }}
+          onDateSelect={(dateStr) => setSelectedDate(dateStr)}
+          locale={i18n.language === 'he' ? 'he-IL' : 'en-US'} // ✅ locale לפי שפה
+          tooltips={tooltipMap} // ✅ מפה של טולטיפים
         />
 
         {selectedDate && (
@@ -137,11 +142,10 @@ const PatientDetailsRow = ({ patient, tasks, refreshTasks }) => {
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
                 />
-                <Button
-                  variant="contained"
-                  onClick={handleReplaceTasks}
-                >
-                  {tasks.find(t => t.date === selectedDate) ? t('task.update_tasks') : t('task.create_tasks')}
+                <Button variant="contained" onClick={handleReplaceTasks}>
+                  {tasks.find(t => t.date === selectedDate)
+                    ? t('task.update_tasks')
+                    : t('task.create_tasks')}
                 </Button>
               </Box>
             )}

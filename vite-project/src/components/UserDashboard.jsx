@@ -1,25 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import ParentView from './views/ParentView';
 import PatientView from './views/PatientView';
+import AdminView from './views/AdminView';
 import DoctorView from './views/DoctorView';
-import { getUserRole } from '../utils/api';
-import { CircularProgress, Typography, Box } from '@mui/material';
+import { getUserRole, registerDeviceToken } from '../utils/api';
+import { requestPermissionAndGetToken } from '../utils/fcm';
 
 const UserDashboard = ({ userEmail }) => {
   const [role, setRole] = useState(null);
   const [userData, setUserData] = useState(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchRole = async () => {
       try {
-        const data = await getUserRole(userEmail);
-        setRole(data.role);
-        setUserData(data);
+        const result = await getUserRole(userEmail);
+        setRole(result.role);
+        setUserData(result);
       } catch (err) {
-        console.error('Error fetching user role:', err);
-      } finally {
-        setLoading(false);
+        console.error('❌ Failed to fetch user role', err);
+        setRole('unknown');
       }
     };
 
@@ -28,37 +27,61 @@ const UserDashboard = ({ userEmail }) => {
     }
   }, [userEmail]);
 
-  if (loading) {
+  useEffect(() => {
+    const sendFcmToken = async () => {
+      if (role === 'patient' && userData?.patient?.id) {
+        const token = await requestPermissionAndGetToken();
+        if (token) {
+          try {
+            await registerDeviceToken(userData.patient.id, token);
+            console.log('📲 Device token registered successfully');
+          } catch (err) {
+            console.error('❌ Failed to register device token', err);
+          }
+        }
+      }
+    };
+
+    sendFcmToken();
+  }, [role, userData]);
+
+  if (!role && userData === null) {
     return (
-      <Box textAlign="center" mt={4}>
-        <CircularProgress />
-        <Typography sx={{ mt: 2 }}>טוען נתוני משתמש...</Typography>
-      </Box>
+      <div style={{ padding: '2rem', textAlign: 'center' }}>
+        <h2>טוען נתוני משתמש...</h2>
+      </div>
     );
   }
 
-  if (!role) {
+  if (!role && userData !== null) {
     return (
-      <Typography sx={{ mt: 3, color: 'error.main' }}>
-        לא ניתן לזהות את תפקיד המשתמש.
-      </Typography>
+      <div style={{ padding: '2rem', textAlign: 'center' }}>
+        <h2>👋 שלום וברוך הבא!</h2>
+        <p>המייל שלך זוהה בהצלחה, אך עדיין לא הוגדר לך תפקיד במערכת.</p>
+        <p>אנא פנה למנהל לצורך שיוך רול.</p>
+      </div>
     );
   }
 
-  switch (role) {
-    case 'doctor':
-      return <DoctorView doctorEmail={userEmail} doctorName={userData.full_name} />;
-    case 'parent':
-      return <ParentView parentEmail={userEmail} />;
-    case 'patient':
-      return <PatientView patient={userData.patient} />;
-    default:
-      return (
-        <Typography sx={{ mt: 3, color: 'error.main' }}>
-          תפקיד לא נתמך: {role}
-        </Typography>
-      );
-  }
+  return (
+    <>
+      {role === 'doctor' && (
+        <DoctorView
+          doctorEmail={userEmail}
+          doctorName={userData?.full_name || ''}
+        />
+      )}
+      {role === 'admin' && <AdminView />}
+      {role === 'parent' && <ParentView parentEmail={userEmail} />}
+      {role === 'patient' && <PatientView patient={userData?.patient} />}
+      {role === 'unknown' && (
+        <div style={{ padding: '2rem', textAlign: 'center' }}>
+          <h2>שגיאה בזיהוי המשתמש</h2>
+          <p>אנא ודא שהתחברת עם חשבון תקין</p>
+        </div>
+      )}
+    </>
+  );
 };
 
 export default UserDashboard;

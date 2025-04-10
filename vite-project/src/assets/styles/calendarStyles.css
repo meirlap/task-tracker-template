@@ -1,0 +1,10 @@
+.calendar-tile-completed {
+    background-color: #c8e6c9 !important; /* ירוק בהיר */
+    border-radius: 50%;
+  }
+  
+  .calendar-tile-incomplete {
+    background-color: #ffcdd2 !important; /* אדום בהיר */
+    border-radius: 50%;
+  }
+  

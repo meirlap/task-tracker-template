@@ -30,6 +30,9 @@ const GoogleLoginButton = ({ onLoginSuccess }) => {
         onSuccess={handleSuccess}
         onError={handleError}
         useOneTap
+        prompt="select_account"
+        auto_select={false}
+        context="signin"
       />
     </div>
   );

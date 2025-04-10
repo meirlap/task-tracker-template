@@ -4,12 +4,17 @@ from models.doctor import Doctor
 from models.parent import Parent
 from models.patient import Patient
 from models.task import Task
+from models.admin import Admin  # ✅ חדש
 from datetime import date, timedelta
 import random
 
 with app.app_context():
     db.drop_all()
     db.create_all()
+
+    # ✅ אדמין מערכת
+    admin = Admin(full_name="Irina Cherbakov", email="irinacherbakov@gmail.com")
+    db.session.add(admin)
 
     # רופאים
     doctor1 = Doctor(full_name="ד\"ר ראובן שפירא", email="jlm.tech.solution.ml@gmail.com")
@@ -36,6 +41,7 @@ with app.app_context():
     db.session.commit()
 
     all_patients = [p1, p2, p3, p4]
+    valid_reasons = ["שכחה", "מחסור ברכיב", "מחלה", "אחר"]
 
     for patient in all_patients:
         # 10 ימים אחורה עם ערכים משתנים
@@ -53,7 +59,7 @@ with app.app_context():
                 task.allergy_reaction = random.choice([0, 1, 2, 3])
                 task.notes = f"הערה לדוגמה {i}"
             else:
-                task.reason_not_completed = random.choice(["שכחתי", "לא הרגשתי טוב", "לא היה בבית"])
+                task.reason_not_completed = random.choice(valid_reasons)
 
             db.session.add(task)
 

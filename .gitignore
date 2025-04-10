@@ -56,3 +56,4 @@ coverage/
 __pycache__/
 *.pid
 vite-project/src/utils/firebase-config.js
+backend/credentials/firebase-admin-key.json

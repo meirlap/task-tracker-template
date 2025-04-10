@@ -6,7 +6,7 @@ import {
   Button,
   CardContent
 } from '@mui/material';
-import { patchTask } from '../utils/api';
+import { replaceTasksFromDate } from '../utils/api';
 import FormContainer from './common/FormContainer';
 
 const TodayTaskForm = ({ task, patientName, onSubmitSuccess, onClose }) => {
@@ -19,39 +19,35 @@ const TodayTaskForm = ({ task, patientName, onSubmitSuccess, onClose }) => {
 
   useEffect(() => {
     if (formData.completed === 'true') {
-      setFormData(prev => ({
-        ...prev,
-        reason_not_completed: '',
-      }));
+      setFormData(prev => ({ ...prev, reason_not_completed: '' }));
     } else if (formData.completed === 'false') {
-      setFormData(prev => ({
-        ...prev,
-        allergy_reaction: '',
-      }));
+      setFormData(prev => ({ ...prev, allergy_reaction: '' }));
     }
   }, [formData.completed]);
 
   const handleChange = (e) => {
-    setFormData(prev => ({
-      ...prev,
-      [e.target.name]: e.target.value
-    }));
+    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleSubmit = async () => {
     try {
-      const updatedTask = await patchTask(task.id, formData);
-      console.log('Task updated successfully:', updatedTask);
+      const result = await replaceTasksFromDate({
+        patient_id: task.patient_id,
+        description: task.description,
+        from_date: task.date,
+        to_date: task.date,
+        completed: formData.completed === 'true',
+        reason_not_completed: formData.reason_not_completed,
+        allergy_reaction: parseInt(formData.allergy_reaction) || null,
+        notes: formData.notes,
+      });
 
-      if (onSubmitSuccess) {
-        onSubmitSuccess(updatedTask);
-      }
+      console.log('Task updated successfully via replace-from-date:', result);
 
-      if (onClose) {
-        onClose(); // סוגר את הטופס אוטומטית
-      }
+      if (onSubmitSuccess) onSubmitSuccess(result);
+      if (onClose) onClose();
     } catch (err) {
-      console.error('Error updating task:', err);
+      console.error('Error updating task via replace-from-date:', err);
     }
   };
 

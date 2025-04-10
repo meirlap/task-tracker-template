@@ -9,7 +9,7 @@ export const getUserRole = async (email) => {
 
 // 👨‍👩‍👧‍👦 PARENTS
 export const getChildrenAndTasks = async (parentEmail) => {
-  const res = await fetch(`${API_BASE_URL}/parent/${encodeURIComponent(parentEmail)}/children-tasks`);
+  const res = await fetch(`${API_BASE_URL}/parents/${encodeURIComponent(parentEmail)}/children-tasks`);
   if (!res.ok) throw new Error('Failed to fetch children/tasks');
   return res.json();
 };
@@ -37,22 +37,6 @@ export const getPatientsTasksByEmail = async (email) => {
   return res.json();
 };
 
-export const getAllDoctors = async () => {
-  const res = await fetch(`${API_BASE_URL}/doctors`);
-  if (!res.ok) throw new Error('Failed to fetch doctors');
-  return res.json();
-};
-
-export const addDoctor = async (doctorData) => {
-  const res = await fetch(`${API_BASE_URL}/doctors`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(doctorData),
-  });
-  if (!res.ok) throw new Error('Failed to add doctor');
-  return res.json();
-};
-
 // 🧍 PATIENTS
 export const updatePatientById = async (id, updatedData) => {
   const res = await fetch(`${API_BASE_URL}/patients/${id}`, {
@@ -70,38 +54,21 @@ export const deletePatientById = async (id) => {
   return res.json();
 };
 
-// ✅ TASKS
-export const patchTask = async (taskId, updateData) => {
-  const res = await fetch(`${API_BASE_URL}/tasks/${taskId}`, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(updateData)
-  });
-  if (!res.ok) throw new Error('Failed to patch task');
-  return res.json();
-};
-
-export const getTasksForPatient = async (patientId, days = 30) => {
-  const res = await fetch(`${API_BASE_URL}/patients/${patientId}/tasks?days=${days}`);
-  if (!res.ok) throw new Error('Failed to get patient tasks');
-  return res.json();
-};
-
-export const createBulkTasks = async ({ patient_id, description, start_date, end_date }) => {
-  const res = await fetch(`${API_BASE_URL}/tasks/bulk`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ patient_id, description, start_date, end_date })
-  });
-  if (!res.ok) throw new Error('Failed to create bulk tasks');
-  return res.json();
-};
-
-export const replaceTasksFromDate = async ({ patient_id, description, start_date, end_date }) => {
+// ✅ TASKS (כל פעולה דרך replace-from-date)
+export const replaceTasksFromDate = async ({ patient_id, description, from_date, to_date, completed, reason_not_completed, allergy_reaction, notes }) => {
   const res = await fetch(`${API_BASE_URL}/tasks/replace-from-date`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ patient_id, description, start_date, end_date })
+    body: JSON.stringify({
+      patient_id,
+      description,
+      start_date: from_date,
+      end_date: to_date,
+      completed,
+      reason_not_completed,
+      allergy_reaction,
+      notes
+    })
   });
   if (!res.ok) throw new Error('Failed to replace tasks');
   return res.json();
@@ -134,7 +101,40 @@ export const addAdmin = async (adminData) => {
   if (!res.ok) throw new Error('Failed to add admin');
   return await res.json();
 };
+
+export const updateAdmin = async (id, data) => {
+  const res = await fetch(`${API_BASE_URL}/admins/${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error('Failed to update admin');
+  return res.json();
+};
+
+export const deleteAdmin = async (id) => {
+  const res = await fetch(`${API_BASE_URL}/admins/${id}`, { method: 'DELETE' });
+  if (!res.ok) throw new Error('Failed to delete admin');
+  return res.json();
+};
+
 // 🧑‍⚕️ DOCTORS
+export const getAllDoctors = async () => {
+  const res = await fetch(`${API_BASE_URL}/doctors`);
+  if (!res.ok) throw new Error('Failed to fetch doctors');
+  return res.json();
+};
+
+export const addDoctor = async (doctorData) => {
+  const res = await fetch(`${API_BASE_URL}/doctors`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(doctorData),
+  });
+  if (!res.ok) throw new Error('Failed to add doctor');
+  return res.json();
+};
+
 export const updateDoctor = async (id, data) => {
   const res = await fetch(`${API_BASE_URL}/doctors/${id}`, {
     method: 'PATCH',
@@ -150,20 +150,8 @@ export const deleteDoctor = async (id) => {
   if (!res.ok) throw new Error('Failed to delete doctor');
   return res.json();
 };
-
-// 🛡️ ADMINS
-export const updateAdmin = async (id, data) => {
-  const res = await fetch(`${API_BASE_URL}/admins/${id}`, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
-  });
-  if (!res.ok) throw new Error('Failed to update admin');
-  return res.json();
-};
-
-export const deleteAdmin = async (id) => {
-  const res = await fetch(`${API_BASE_URL}/admins/${id}`, { method: 'DELETE' });
-  if (!res.ok) throw new Error('Failed to delete admin');
+export const getTasksForPatient = async (patientId, days = 30) => {
+  const res = await fetch(`${API_BASE_URL}/tasks/patients/${patientId}/tasks?days=${days}`);
+  if (!res.ok) throw new Error('Failed to get patient tasks');
   return res.json();
 };

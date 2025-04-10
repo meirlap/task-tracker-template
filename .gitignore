@@ -55,3 +55,4 @@ coverage/
 # Others
 __pycache__/
 *.pid
+vite-project/src/utils/firebase-config.js

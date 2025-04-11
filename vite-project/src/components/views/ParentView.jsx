@@ -3,7 +3,7 @@ import {
   Card, CardContent, Typography, Button, Box, Collapse
 } from '@mui/material';
 import { getChildrenAndTasks } from '../../utils/api';
-import TodayTaskForm from '../TodayTaskForm';
+import TodayTaskFormParent from '../TodayTaskFormParent';
 import TaskHistoryList from '../TaskHistoryList';
 
 const ParentView = ({ parentEmail }) => {
@@ -87,14 +87,17 @@ const ParentView = ({ parentEmail }) => {
 
                 {todayTask && (
                   <Collapse in={showTodayForm[child.id]}>
-                    <TodayTaskForm
+                    <TodayTaskFormParent
                       task={todayTask}
+                      patientId={child.id}
+                      defaultDate={new Date(todayTask.date)}
                       patientName={child.name}
                       onSubmitSuccess={(updatedTask) =>
                         updateTaskInState(child.id, updatedTask)
                       }
-                      onClose={() => toggleTodayForm(child.id)} // סוגר את הטופס
+                      onClose={() => toggleTodayForm(child.id)}
                     />
+
 
                   </Collapse>
                 )}

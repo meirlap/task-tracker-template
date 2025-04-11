@@ -155,3 +155,13 @@ export const getTasksForPatient = async (patientId, days = 30) => {
   if (!res.ok) throw new Error('Failed to get patient tasks');
   return res.json();
 };
+export const updateTodayTask = async ({ patient_id, task_date, completed, reason_not_completed, allergy_reaction, notes }) => {
+  const res = await fetch(`${API_BASE_URL}/tasks/update-today`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ patient_id, task_date, completed, reason_not_completed, allergy_reaction, notes }),
+  });
+  if (!res.ok) throw new Error('Failed to update today\'s task');
+  return res.json();
+};
+

@@ -73,7 +73,14 @@ const UserDashboard = ({ userEmail }) => {
       )}
       {role === 'admin' && <AdminView />}
       {role === 'parent' && <ParentView parentEmail={userEmail} />}
-      {role === 'patient' && <PatientView patient={userData?.patient} />}
+      {role === 'patient' && (
+        <PatientView
+          userEmail={userEmail}
+          patientId={userData?.patient?.id}
+          fullName={userData?.patient?.full_name}
+        />
+      )}
+
       {role === 'unknown' && (
         <div style={{ padding: '2rem', textAlign: 'center' }}>
           <h2>שגיאה בזיהוי המשתמש</h2>

@@ -8,11 +8,10 @@ from routes.users import users_bp
 from routes.notifications import notifications_bp  
 from routes.admins import admins_bp
 
-from apscheduler.schedulers.background import BackgroundScheduler
-from datetime import datetime
 
 app = Flask(__name__)
-CORS(app, supports_credentials=True)
+CORS(app, resources={r"/api/*":{"origins": "*"}}, supports_credentials=True)
+
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///dev.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -34,7 +33,7 @@ def schedule_daily_pushes():
     scheduler.start()
 
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
-        schedule_daily_pushes()
-    app.run(debug=True)
+    print("📍 All Registered Routes:")
+    for rule in app.url_map.iter_rules():
+        print(f"{rule} → {','.join(rule.methods)}")
+    app.run(host='0.0.0.0', port=5000)

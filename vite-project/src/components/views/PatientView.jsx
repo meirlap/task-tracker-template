@@ -2,29 +2,35 @@ import React, { useEffect, useState } from 'react';
 import {
   Card, CardContent, Typography, Button, Box, Collapse
 } from '@mui/material';
-import { getTasksForPatient } from '../../utils/api';
-import TodayTaskForm from '../TodayTaskForm';
+import { getUserRole, getTasksForPatient } from '../../utils/api';
+import TodayTaskFormParent from '../TodayTaskFormParent';
 import TaskHistoryList from '../TaskHistoryList';
 
-const PatientView = ({ patient }) => {
+const PatientView = ({ userEmail, patientId, fullName }) => {
   const [tasks, setTasks] = useState([]);
-  const [showTodayForm, setShowTodayForm] = useState(false);
-  const [showHistory, setShowHistory] = useState(true); // ✅ פתוח כברירת מחדל
+  const [todayTask, setTodayTask] = useState(null);
+  const [showTodayForm, setShowTodayForm] = useState(true);
+  const [showHistory, setShowHistory] = useState(false);
 
   const todayStr = new Date().toISOString().split('T')[0];
 
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const data = await getTasksForPatient(patient.id, 30);
-        setTasks(data);
+        if (patientId) {
+          const taskList = await getTasksForPatient(patientId, 30);
+          setTasks(taskList);
+          const today = new Date().toISOString().split('T')[0];
+          const todayTask = taskList.find(task => task.date === today);
+          setTodayTask(todayTask);
+        }
       } catch (err) {
-        console.error('שגיאה בטעינת משימות למטופל:', err);
+        console.error('Failed to fetch patient tasks:', err);
       }
     };
 
-    if (patient?.id) fetchTasks();
-  }, [patient]);
+    fetchTasks();
+  }, [userEmail, patientId]);
 
   const toggleTodayForm = () => {
     setShowTodayForm(prev => !prev);
@@ -36,19 +42,16 @@ const PatientView = ({ patient }) => {
 
   const updateTaskInState = (updatedTask) => {
     setTasks(prev =>
-      prev.map(task =>
-        task.id === updatedTask.id ? updatedTask : task
-      )
+      prev.map(task => task.id === updatedTask.id ? updatedTask : task)
     );
+    setTodayTask(updatedTask);
   };
-
-  const todayTask = tasks.find(task => task.date === todayStr);
 
   return (
     <Box>
       <Card sx={{ mb: 3 }}>
         <CardContent>
-          <Typography variant="h6">{patient.full_name}</Typography>
+          <Typography variant="h6">שלום {fullName}</Typography>
 
           {todayTask && (
             <Typography sx={{ mt: 1 }}>
@@ -76,9 +79,11 @@ const PatientView = ({ patient }) => {
 
           {todayTask && (
             <Collapse in={showTodayForm}>
-              <TodayTaskForm
+              <TodayTaskFormParent
                 task={todayTask}
-                patientName={patient.full_name}
+                patientId={patientId}
+                defaultDate={new Date(todayTask.date)}
+                patientName={fullName}
                 onSubmitSuccess={updateTaskInState}
                 onClose={toggleTodayForm}
               />

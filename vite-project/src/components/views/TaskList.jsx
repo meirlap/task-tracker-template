@@ -7,7 +7,7 @@ import {
   MenuItem,
   Button
 } from '@mui/material';
-import { patchTask } from '../../utils/api';
+import { updateTodayTask } from '../../utils/api';
 
 const TaskList = ({ patient, updateTaskInList }) => {
   const [showFeedbackForm, setShowFeedbackForm] = useState(false);
@@ -27,7 +27,14 @@ const TaskList = ({ patient, updateTaskInList }) => {
 
   const handleSubmit = async () => {
     try {
-      const updatedTask = await patchTask(todayTask.id, formData);
+      const updatedTask = await updateTodayTask({
+        patient_id: patient.id,
+        task_date: todayTask.date,
+        completed: formData.completed === 'true',
+        reason_not_completed: formData.reason_not_completed,
+        allergy_reaction: Number(formData.allergy_reaction),
+        notes: formData.notes
+      });
 
       updateTaskInList(updatedTask);
       setShowFeedbackForm(false);
@@ -82,9 +89,9 @@ const TaskList = ({ patient, updateTaskInList }) => {
                 onChange={handleChange}
                 sx={{ mt: 2 }}
               >
-                <MenuItem value="מחלה">מחלה</MenuItem>
                 <MenuItem value="שכחתי">שכחתי</MenuItem>
                 <MenuItem value="מחסור במוצר">מחסור במוצר</MenuItem>
+                <MenuItem value="מחלה">מחלה</MenuItem>
                 <MenuItem value="אחר">אחר</MenuItem>
               </TextField>
             )}

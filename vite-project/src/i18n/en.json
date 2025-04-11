@@ -6,6 +6,7 @@
     "login_prompt": "Please log in"
   },
   "dashboard": {
+    "hello_doctor":"hello_doctor",
     "select_child": "Select Child",
     "back": "Back to list",
     "tasks_title": "{{name}}'s Tasks",

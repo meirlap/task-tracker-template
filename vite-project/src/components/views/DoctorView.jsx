@@ -73,7 +73,7 @@ const DoctorView = ({ doctorEmail, doctorName }) => {
   return (
     <Container maxWidth={false} sx={{ mt: 4, px: 4 }}>
       <Typography variant="h4" gutterBottom>
-        {t('hello_doctor')} {doctorName}
+        {t('dashboard.hello_doctor')} {doctorName}
       </Typography>
 
       <Grid container spacing={2} sx={{ mb: 2 }} alignItems="center">
